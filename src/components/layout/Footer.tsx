@@ -1,48 +1,21 @@
 export const Footer = () => (
-  <footer style={{
-    borderTop: '1px solid var(--color-border-light)',
-    background: '#ffffff',
-    padding: '14px 24px',
-  }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      flexWrap: 'wrap',
-      gap: '8px',
-      fontSize: '11px',
-      color: 'var(--color-muted)',
-    }}>
-      <span>
-        <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>PhosNet</span>
+  <footer style={{ borderTop: '1.5px solid var(--color-border-light)', background: '#ffffff', padding: '12px 30px' }}>
+    <style>{`
+      .footer-link { color: var(--color-faint); text-decoration: none; font-size: 11px; font-weight: 500; transition: color .15s; }
+      .footer-link:hover { color: var(--color-primary); }
+    `}</style>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+      <span style={{ fontSize: '11px', color: 'var(--color-muted)' }}>
+        <strong style={{ color: 'var(--color-primary)', fontWeight: 700 }}>PhosNet</strong>
         {' '}— 300,038 phosphorylation sites · 44,112 proteins · ≥13 species
       </span>
-      <div style={{ display: 'flex', gap: '16px' }}>
-        <a href="/about" style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
-           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
-           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
-          About
-        </a>
-        <a href="/about#citation" style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
-           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
-           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
-          Cite
-        </a>
-        <a href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/docs`}
-           target="_blank" rel="noreferrer"
-           style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
-           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
-           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
-          API
-        </a>
-        <a href="https://habdsk.org/" target="_blank" rel="noreferrer"
-           style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
-           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
-           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
-          S-Khan Lab
-        </a>
+      <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+        <a href="/about"          className="footer-link">About</a>
+        <a href="/about#citation" className="footer-link">Cite</a>
+        <a href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/docs`} target="_blank" rel="noreferrer" className="footer-link">API Docs</a>
+        <a href="https://habdsk.org/" target="_blank" rel="noreferrer" className="footer-link">S-Khan Lab</a>
       </div>
-      <span style={{ color: '#94a3b8' }}>&copy; 2026 PhosNet · CC BY 4.0</span>
+      <span style={{ fontSize: '11px', color: 'var(--color-faint)' }}>&copy; 2026 PhosNet · CC BY 4.0</span>
     </div>
   </footer>
 )

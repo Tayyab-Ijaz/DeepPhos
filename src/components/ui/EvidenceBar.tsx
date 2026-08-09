@@ -1,29 +1,36 @@
-/**
- * Visual DAS bar — shows which source databases a site was found in.
- */
-const DB_LABELS: Record<string, { label: string; color: string }> = {
-  PhosphoSitePlus:    { label: 'PSP',   color: 'bg-blue-500' },
-  'Phospho.ELM':      { label: 'ELM',   color: 'bg-purple-500' },
-  PTMS_dataset:       { label: 'PTMS',  color: 'bg-green-500' },
-  DbPAF_SysPTM_other: { label: 'Other', color: 'bg-gray-400' },
+const DB_META: Record<string, { label: string; bg: string; color: string }> = {
+  PhosphoSitePlus:    { label: 'PSP',   bg: '#DBEAFE', color: '#1D4ED8' },
+  'Phospho.ELM':      { label: 'ELM',   bg: '#EDE9FE', color: '#6D28D9' },
+  PTMS_dataset:       { label: 'PTMS',  bg: '#D1FAE5', color: '#065F46' },
+  DbPAF_SysPTM_other: { label: 'Other', bg: '#F1F5F9', color: '#475569' },
 }
 
 export const EvidenceBar = ({ sources, pds }: { sources: string[]; pds: number }) => (
-  <div className="space-y-1">
-    <div className="flex flex-wrap gap-1">
+  <div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: sources.length ? 4 : 0 }}>
       {sources.map(src => {
-        const meta = DB_LABELS[src] ?? { label: src, color: 'bg-gray-400' }
+        const m = DB_META[src] ?? { label: src, bg: '#F1F5F9', color: '#475569' }
         return (
-          <span key={src}
-            className={`${meta.color} text-white text-xs px-2 py-0.5 rounded font-medium`}>
-            {meta.label}
+          <span key={src} style={{
+            display: 'inline-block',
+            background: m.bg, color: m.color,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.625rem', fontWeight: 700,
+            padding: '2px 6px', borderRadius: 4,
+            border: `1px solid ${m.bg === '#F1F5F9' ? '#E2E8F0' : m.bg}`,
+          }}>
+            {m.label}
           </span>
         )
       })}
       {sources.length === 0 && (
-        <span className="text-gray-400 text-xs">No source tag</span>
+        <span style={{ fontSize: '0.75rem', color: 'var(--color-faint)' }}>—</span>
       )}
     </div>
-    <p className="text-xs text-gray-500">{pds} publication{pds !== 1 ? 's' : ''}</p>
+    {pds > 0 && (
+      <p style={{ fontSize: '0.7rem', color: 'var(--color-faint)', margin: 0 }}>
+        {pds} pub{pds !== 1 ? 's' : ''}
+      </p>
+    )}
   </div>
 )
