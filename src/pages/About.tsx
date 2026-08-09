@@ -1,41 +1,42 @@
-import { Dna, Brain } from 'lucide-react'
+import { Brain } from 'lucide-react'
 
-const Section = ({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) => (
-  <section id={id} className="mb-14">
-    <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
-      <span className="h-1 w-5 rounded-full bg-brand-500 inline-block" />
-      {title}
-    </h2>
-    {children}
-  </section>
+const InfoCard = ({ children, accentColor = '#2563EB' }: { children: React.ReactNode; accentColor?: string }) => (
+  <div className="card" style={{ borderTop: `3px solid ${accentColor}`, marginBottom: 16 }}>
+    <div style={{ padding: '20px 24px' }}>{children}</div>
+  </div>
+)
+
+const CardTitle = ({ children }: { children: React.ReactNode }) => (
+  <p style={{
+    fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase',
+    letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 10,
+  }}>{children}</p>
 )
 
 const P = ({ children }: { children: React.ReactNode }) => (
-  <p className="text-[14px] text-gray-600 leading-[1.75] mb-3">{children}</p>
+  <p style={{ fontSize: '0.875rem', color: 'var(--color-muted)', lineHeight: 1.75, marginBottom: 10 }}>{children}</p>
 )
 
 const SourceTable = () => (
-  <div className="overflow-x-auto mt-4">
-    <table className="w-full text-sm">
+  <div style={{ overflowX: 'auto' }}>
+    <table className="data-table">
       <thead>
-        <tr className="border-b-2 border-gray-200">
-          {['Database', 'Sites', 'Species', 'Notes'].map(h => (
-            <th key={h} className="px-4 py-3 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">{h}</th>
-          ))}
+        <tr>
+          {['Database', 'Sites', 'Species', 'Notes'].map(h => <th key={h}>{h}</th>)}
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-100">
+      <tbody>
         {[
           ['PhosphoSitePlus', '~250,000', 'Multi-species', 'Curated, literature-based'],
           ['Phospho.ELM',     '~42,000',  'Multi-species', 'Experimental, MS/MS + literature'],
           ['PTMS Dataset',    '~190,672', 'Multi-species', 'High-throughput MS/MS'],
           ['DbPAF / SysPTM',  'Included', 'Multi-species', 'Aggregated via PMID overlap'],
         ].map(row => (
-          <tr key={row[0]} className="hover:bg-gray-50/50 transition-colors">
-            <td className="px-4 py-3 font-semibold text-gray-800">{row[0]}</td>
-            <td className="px-4 py-3 text-gray-600 font-mono text-xs">{row[1]}</td>
-            <td className="px-4 py-3 text-gray-500">{row[2]}</td>
-            <td className="px-4 py-3 text-gray-500">{row[3]}</td>
+          <tr key={row[0]}>
+            <td style={{ fontWeight: 600 }}>{row[0]}</td>
+            <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.78rem' }}>{row[1]}</td>
+            <td>{row[2]}</td>
+            <td style={{ color: 'var(--color-muted)' }}>{row[3]}</td>
           </tr>
         ))}
       </tbody>
@@ -44,140 +45,145 @@ const SourceTable = () => (
 )
 
 export const About = () => (
-  <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+  <div style={{ maxWidth: 840, padding: '28px 32px' }}>
 
     {/* Page header */}
-    <div className="mb-12">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 shadow-sm">
-          <Dna className="h-5 w-5 text-white" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">About DeepPhos</h1>
-          <p className="text-sm text-gray-400">Phosphorylation Meta-Database</p>
-        </div>
-      </div>
-      <p className="text-gray-500 text-[15px] leading-relaxed max-w-2xl mt-3">
+    <div style={{ marginBottom: 28 }}>
+      <h1 className="page-title">About PhosNet</h1>
+      <p className="page-subtitle">
         A unified, consensus-scored resource for serine, threonine and tyrosine phosphorylation,
         integrating five major databases with ML-guided novel site rescue.
       </p>
     </div>
 
-    <Section title="Background">
+    {/* Background */}
+    <InfoCard accentColor="#2563EB">
+      <CardTitle>Background</CardTitle>
       <P>
         Phosphorylation is the most prevalent post-translational modification in eukaryotic
         signalling. Despite the availability of several specialist databases
         (PhosphoSitePlus, Phospho.ELM, HPRD, DbPAF, SysPTM), each resource captures a
-        different subset of the experimentally verified landscape. DeepPhos integrates these
+        different subset of the experimentally verified landscape. PhosNet integrates these
         sources into a single, confidence-scored database.
       </P>
       <P>
         A key challenge is that no single raw file captures all sources simultaneously.
-        DeepPhos documents this as a provenance limitation: DAS=0 sites are those that appear
+        PhosNet documents this as a provenance limitation: DAS=0 sites are those that appear
         only in one aggregated file and cannot be unambiguously attributed to a single
         upstream database.
       </P>
-    </Section>
+    </InfoCard>
 
-    <Section title="Pipeline Overview">
+    {/* Pipeline */}
+    <InfoCard accentColor="#7c3aed">
+      <CardTitle>Pipeline Overview</CardTitle>
       <P>
-        The schematic below illustrates the full DeepPhos data integration and scoring
-        pipeline &mdash; from raw source databases through consensus scoring, evidence tiering,
+        The schematic below illustrates the full PhosNet data integration and scoring
+        pipeline — from raw source databases through consensus scoring, evidence tiering,
         and ML-guided novel site rescue.
       </P>
-      <div className="mt-5 card overflow-hidden">
-        <img
-          src="/pipeline_flowchart.png"
-          alt="DeepPhos pipeline flowchart"
-          className="w-full"
-          style={{ maxHeight: 640, objectFit: 'contain' }}
-        />
+      <div style={{ marginTop: 12, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--color-border-blue)' }}>
+        <img src="/pipeline_flowchart.png" alt="PhosNet pipeline flowchart"
+             style={{ width: '100%', maxHeight: 600, objectFit: 'contain', display: 'block' }} />
       </div>
-    </Section>
+    </InfoCard>
 
-    <Section title="Data Sources">
-      <P>
-        The following primary databases were integrated into DeepPhos:
-      </P>
-      <div className="card overflow-hidden">
-        <SourceTable />
-      </div>
-    </Section>
+    {/* Data sources */}
+    <InfoCard accentColor="#059669">
+      <CardTitle>Data Sources</CardTitle>
+      <P>The following primary databases were integrated into PhosNet:</P>
+      <SourceTable />
+    </InfoCard>
 
-    <Section title="Scoring System">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="card p-5">
-          <h3 className="font-bold text-gray-800 text-sm mb-2">Database Agreement Score (DAS)</h3>
-          <p className="text-[13px] text-gray-500 leading-relaxed">
-            Counts how many distinct source databases report a given (UniProt ID,
-            residue type, position) triplet.
+    {/* Scoring */}
+    <InfoCard accentColor="#d97706">
+      <CardTitle>Scoring System</CardTitle>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+        <div className="stat-box" style={{ textAlign: 'left', padding: '14px 16px' }}>
+          <p style={{ fontWeight: 700, fontSize: '0.8125rem', marginBottom: 6, color: 'var(--color-text)' }}>
+            Database Agreement Score (DAS)
           </p>
-          <p className="mt-2 text-xs font-bold text-brand-600 bg-brand-50 px-3 py-1.5 rounded-lg inline-block">
-            Range: 0 &ndash; 3
+          <p style={{ fontSize: '0.78rem', color: 'var(--color-muted)', lineHeight: 1.55 }}>
+            Counts how many distinct source databases report a given (UniProt ID, residue type, position) triplet.
           </p>
+          <span className="source-tag" style={{ marginTop: 10, display: 'inline-block' }}>Range: 0 – 3</span>
         </div>
-        <div className="card p-5">
-          <h3 className="font-bold text-gray-800 text-sm mb-2">Publication Depth Score (PDS)</h3>
-          <p className="text-[13px] text-gray-500 leading-relaxed">
-            Number of unique PubMed IDs that report a given site, reflecting
-            independent experimental validation.
+        <div className="stat-box" style={{ textAlign: 'left', padding: '14px 16px' }}>
+          <p style={{ fontWeight: 700, fontSize: '0.8125rem', marginBottom: 6, color: 'var(--color-text)' }}>
+            Publication Depth Score (PDS)
           </p>
-          <p className="mt-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg inline-block">
-            Range: 0 &ndash; n
+          <p style={{ fontSize: '0.78rem', color: 'var(--color-muted)', lineHeight: 1.55 }}>
+            Number of unique PubMed IDs that report a given site, reflecting independent experimental detection.
           </p>
+          <span className="source-tag" style={{ marginTop: 10, display: 'inline-block', borderColor: '#a7f3d0', color: '#059669', background: '#ecfdf5' }}>Range: 0 – n</span>
         </div>
       </div>
 
-      <div className="card p-5 mt-4">
-        <h3 className="font-bold text-gray-800 text-sm mb-2">Confidence Score</h3>
-        <code className="block bg-gray-900 text-brand-300 rounded-xl px-4 py-3 text-sm font-mono mb-3">
-          confidence = DAS &times; log(1 + PDS)
-        </code>
-        <p className="text-[13px] text-gray-500">
-          A composite metric combining database agreement and publication depth.
+      <div style={{ background: '#0f172a', borderRadius: 10, padding: '12px 18px', marginBottom: 12 }}>
+        <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.8rem', color: '#93c5fd', marginBottom: 4 }}>
+          Confidence Score
         </p>
+        <code style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.875rem', color: '#f1f5f9' }}>
+          confidence = DAS × log(1 + PDS)
+        </code>
       </div>
 
-      <div className="card p-5 mt-4">
-        <h3 className="font-bold text-gray-800 text-sm mb-3">Evidence Tiers</h3>
-        <div className="space-y-2">
-          {[
-            { tier: 'GOLD',   rule: 'DAS \u2265 2 OR PDS \u2265 5',    bg: 'bg-amber-50 border-amber-200',   dot: 'bg-amber-500', text: 'text-amber-800' },
-            { tier: 'SILVER', rule: 'DAS \u2265 1 AND PDS \u2265 2',   bg: 'bg-gray-50 border-gray-200',     dot: 'bg-gray-400',  text: 'text-gray-700' },
-            { tier: 'BRONZE', rule: 'All remaining sites',             bg: 'bg-orange-50 border-orange-200', dot: 'bg-orange-500', text: 'text-orange-800' },
-          ].map(t => (
-            <div key={t.tier} className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 ${t.bg}`}>
-              <span className={`h-2.5 w-2.5 rounded-full ${t.dot} shrink-0`} />
-              <span className={`text-sm font-bold ${t.text} w-16`}>{t.tier}</span>
-              <span className="text-[13px] text-gray-600">{t.rule}</span>
-            </div>
-          ))}
-        </div>
+      {/* Evidence tiers */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {[
+          { tier: 'GOLD',   rule: 'DAS ≥ 2 OR PDS ≥ 5',    color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+          { tier: 'SILVER', rule: 'DAS ≥ 1 AND PDS ≥ 2',   color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb' },
+          { tier: 'BRONZE', rule: 'All remaining sites',     color: '#b45309', bg: '#fefce8', border: '#fef08a' },
+        ].map(t => (
+          <div key={t.tier} style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: t.bg, border: `1px solid ${t.border}`,
+            borderRadius: 8, padding: '10px 14px',
+          }}>
+            <span style={{ height: 10, width: 10, borderRadius: '50%', background: t.color, flexShrink: 0 }} />
+            <span style={{ fontWeight: 700, fontSize: '0.8125rem', color: t.color, width: 60 }}>{t.tier}</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--color-muted)' }}>{t.rule}</span>
+          </div>
+        ))}
       </div>
-    </Section>
+    </InfoCard>
 
-    <Section title="ML Prediction">
-      <div className="card p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shrink-0">
-            <Brain className="h-5 w-5" />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-900 text-sm mb-2">PhosConsensus-Predict</h3>
-            <P>
-              A multi-layer perceptron trained on ESM-2 (650M) residue
-              embeddings. Only serine, threonine and tyrosine positions are embedded, reducing
-              storage by approximately 20x compared to full-sequence embeddings.
-            </P>
-            <P>
-              Training uses evidence-weighted binary cross-entropy loss to handle class imbalance,
-              GroupKFold cross-validation at the protein level (no data leakage), and
-              CosineAnnealingLR scheduling. The model is exported as ONNX for production serving.
-            </P>
+    {/* ML prediction */}
+    <InfoCard accentColor="#DB2777">
+      <CardTitle>ML Prediction — PhosConsensus-Predict</CardTitle>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          height: 42, width: 42, borderRadius: 10, flexShrink: 0,
+          background: 'linear-gradient(135deg,#7c3aed,#DB2777)', color: '#fff',
+        }}>
+          <Brain size={20} />
+        </div>
+        <div>
+          <P>
+            A multi-layer perceptron trained on ESM-2 (650M) per-residue embeddings (1,280 dimensions).
+            Only serine, threonine and tyrosine positions are embedded, reducing storage by ~20× versus
+            full-sequence embeddings.
+          </P>
+          <P>
+            Training uses evidence-weighted binary cross-entropy, GroupKFold cross-validation at the
+            protein level, and CosineAnnealingLR scheduling. Deployed as ONNX for production serving.
+          </P>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 4 }}>
+            {[
+              { label: 'AUC-ROC (held-out)', value: '0.8928' },
+              { label: 'AUC-PR (held-out)',  value: '0.5323' },
+              { label: 'Test sites',          value: '157,117' },
+            ].map(m => (
+              <div key={m.label} className="stat-box" style={{ padding: '8px 14px' }}>
+                <p className="stat-value" style={{ fontSize: '1rem' }}>{m.value}</p>
+                <p className="stat-label">{m.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </Section>
+    </InfoCard>
 
   </div>
 )

@@ -13,10 +13,7 @@ Q9Y243\tS\t473`
 const MAX_SITES = 5000
 
 function parseInput(raw: string): BatchInputItem[] {
-  return raw
-    .split('\n')
-    .map(l => l.trim())
-    .filter(Boolean)
+  return raw.split('\n').map(l => l.trim()).filter(Boolean)
     .map(l => {
       const parts = l.split(/[\t,\s]+/)
       return { uniprot_id: parts[0] ?? '', residue: parts[1] ?? '', position: Number(parts[2]) }
@@ -31,21 +28,19 @@ function downloadCsv(rows: BatchResultItem[]) {
   ).join('\n')
   const blob = new Blob([header + body], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url; a.download = 'phdb_batch_results.csv'; a.click()
+  const a = document.createElement('a'); a.href = url; a.download = 'phosnet_batch_results.csv'; a.click()
   URL.revokeObjectURL(url)
 }
 
 export const BatchAnnotator = () => {
-  const [inputText, setInputText]   = useState('')
-  const [results,   setResults]     = useState<BatchResultItem[]>([])
-  const [loading,   setLoading]     = useState(false)
-  const [error,     setError]       = useState('')
+  const [inputText, setInputText] = useState('')
+  const [results,   setResults]   = useState<BatchResultItem[]>([])
+  const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]
-    if (!f) return
+    const f = e.target.files?.[0]; if (!f) return
     const reader = new FileReader()
     reader.onload = ev => setInputText(ev.target?.result as string)
     reader.readAsText(f)
@@ -55,42 +50,37 @@ export const BatchAnnotator = () => {
     const sites = parseInput(inputText)
     if (sites.length === 0) { setError('No valid sites found. Use format: UniProtID  RES  POS'); return }
     if (sites.length > MAX_SITES) { setError(`Max ${MAX_SITES} sites per request. You provided ${sites.length}.`); return }
-    setError('')
-    setLoading(true)
-    try {
-      const res = await batchAnnotate(sites)
-      setResults(res)
-    } catch {
-      setError('Batch request failed. Check that the API is running.')
-    } finally {
-      setLoading(false)
-    }
+    setError(''); setLoading(true)
+    try { setResults(await batchAnnotate(sites)) }
+    catch { setError('Batch request failed. Check that the API is running.') }
+    finally { setLoading(false) }
   }
 
-  const known  = results.filter(r => r.status === 'KNOWN').length
-  const novel  = results.filter(r => r.status === 'NOVEL').length
+  const known    = results.filter(r => r.status === 'KNOWN').length
+  const novel    = results.filter(r => r.status === 'NOVEL').length
   const notFound = results.filter(r => r.status === 'NOT_FOUND').length
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Batch Annotator</h1>
-        <p className="text-sm text-gray-500 mt-1">
+    <div style={{ padding: '28px 32px', maxWidth: 1100 }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: 24 }}>
+        <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Batch Annotator</h1>
+        <p className="page-subtitle">
           Submit up to {MAX_SITES.toLocaleString()} sites. Each site is labelled KNOWN, NOVEL, or NOT_FOUND.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 20 }}>
 
-        {/* Input panel */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-gray-700">Input Sites</h2>
-              <button
-                onClick={() => setInputText(EXAMPLE)}
-                className="text-xs text-brand-600 hover:underline"
-              >
+        {/* ── Input panel ─────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+          <div className="card card-accent-blue" style={{ padding: '18px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <p style={{ fontWeight: 700, fontSize: '0.8125rem' }}>Input Sites</p>
+              <button onClick={() => setInputText(EXAMPLE)}
+                style={{ fontSize: '0.75rem', color: 'var(--color-primary)', cursor: 'pointer', background: 'none', border: 'none' }}>
                 Load example
               </button>
             </div>
@@ -99,110 +89,100 @@ export const BatchAnnotator = () => {
               value={inputText}
               onChange={e => setInputText(e.target.value)}
               placeholder={`One site per line:\nUniProtID  RES  POS\n\nExample:\nP04637  S  15\nP00533  T  669`}
-              className="w-full h-48 border border-gray-200 rounded-lg p-3 text-xs font-mono
-                         focus:outline-none focus:border-brand-400 resize-none"
+              style={{
+                width: '100%', height: 180,
+                border: '1px solid var(--color-border-blue)', borderRadius: 8,
+                padding: '10px 12px', fontSize: '0.78rem',
+                fontFamily: "'JetBrains Mono',monospace",
+                resize: 'none', outline: 'none',
+                background: 'var(--color-bg)',
+              }}
+              onFocus={e => { e.currentTarget.style.borderColor = '#60A5FA'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(96,165,250,0.15)' }}
+              onBlur={e  => { e.currentTarget.style.borderColor = 'var(--color-border-blue)'; e.currentTarget.style.boxShadow = 'none' }}
             />
 
-            <div className="flex items-center gap-3 mt-3">
-              <button
-                onClick={() => fileRef.current?.click()}
-                className="flex items-center gap-2 text-xs border border-gray-200 rounded-lg px-3 py-1.5
-                           hover:border-brand-400 text-gray-600"
-              >
-                <Upload className="h-3.5 w-3.5" /> Upload TSV
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+              <button onClick={() => fileRef.current?.click()} className="btn-ghost" style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Upload size={13} /> Upload TSV
               </button>
-              <input ref={fileRef} type="file" accept=".tsv,.txt,.csv" className="hidden" onChange={handleFile} />
-              <span className="text-xs text-gray-400 ml-auto">
+              <input ref={fileRef} type="file" accept=".tsv,.txt,.csv" style={{ display: 'none' }} onChange={handleFile} />
+              <span style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginLeft: 'auto' }}>
                 {parseInput(inputText).length} sites parsed
               </span>
             </div>
 
-            {error && <div className="mt-3"><ErrorBox message={error} /></div>}
+            {error && <div style={{ marginTop: 10 }}><ErrorBox message={error} /></div>}
 
-            <button
-              onClick={handleSubmit}
-              disabled={loading || !inputText.trim()}
-              className="mt-4 w-full py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold
-                         hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? 'Annotating…' : 'Annotate'}
+            <button onClick={handleSubmit} disabled={loading || !inputText.trim()}
+              className="btn-primary" style={{ width: '100%', marginTop: 12 }}>
+              {loading ? 'Annotating…' : 'Annotate Sites'}
             </button>
           </div>
 
-          {/* Format help */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-700 space-y-1">
-            <div className="flex items-center gap-1 font-semibold mb-2">
-              <HelpCircle className="h-3.5 w-3.5" /> Format guide
+          {/* Format guide */}
+          <div className="card card-accent-indigo" style={{ padding: '14px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: '0.75rem', marginBottom: 8, color: 'var(--color-primary)' }}>
+              <HelpCircle size={13} /> Format Guide
             </div>
-            <p>Tab-separated or space-separated, one site per line:</p>
-            <code className="block bg-blue-100 rounded p-2 mt-1 font-mono">
-              UniProtID  RES  POS<br />
-              P04637  S  15<br />
-              P00533  T  669
-            </code>
-            <p className="mt-2">RES: S, T, or Y. POS: integer position.</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: 6 }}>
+              Tab-separated or space-separated, one site per line:
+            </p>
+            <div className="code-block" style={{ fontSize: '0.75rem', padding: '8px 12px' }}>
+              UniProtID{'  '}RES{'  '}POS<br />
+              P04637{'  '}S{'  '}15<br />
+              P00533{'  '}T{'  '}669
+            </div>
+            <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginTop: 8 }}>
+              RES: S, T, or Y &nbsp;·&nbsp; POS: integer position.
+            </p>
           </div>
         </div>
 
-        {/* Results panel */}
-        <div className="lg:col-span-3">
+        {/* ── Results panel ────────────────────────────────────────────── */}
+        <div>
           {loading && <LoadingSpinner label="Annotating sites…" />}
 
           {!loading && results.length > 0 && (
             <>
-              {/* Summary */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              {/* Summary stats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 16 }}>
                 {[
-                  { label: 'KNOWN',     count: known,    icon: <CheckCircle className="h-4 w-4 text-green-500" /> },
-                  { label: 'NOVEL',     count: novel,    icon: <AlertCircle className="h-4 w-4 text-blue-500" /> },
-                  { label: 'NOT FOUND', count: notFound, icon: <HelpCircle  className="h-4 w-4 text-gray-400" /> },
+                  { label: 'KNOWN',     count: known,    icon: <CheckCircle size={18} style={{ color: '#059669' }} />, color: '#059669' },
+                  { label: 'NOVEL',     count: novel,    icon: <AlertCircle size={18} style={{ color: '#2563EB' }} />, color: '#2563EB' },
+                  { label: 'NOT FOUND', count: notFound, icon: <HelpCircle  size={18} style={{ color: '#94a3b8' }} />, color: '#94a3b8' },
                 ].map(s => (
-                  <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                    <div className="flex justify-center mb-1">{s.icon}</div>
-                    <p className="text-xl font-bold text-gray-800">{s.count}</p>
-                    <p className="text-xs text-gray-500">{s.label}</p>
+                  <div key={s.label} className="stat-box" style={{ textAlign: 'center', padding: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>{s.icon}</div>
+                    <p style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 700, fontSize: '1.25rem', color: s.color }}>{s.count}</p>
+                    <p className="stat-label">{s.label}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={() => downloadCsv(results)}
-                  className="flex items-center gap-2 text-xs border border-gray-200 rounded-lg px-3 py-1.5
-                             hover:border-brand-400 text-gray-600"
-                >
-                  <Download className="h-3.5 w-3.5" /> Download CSV
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+                <button onClick={() => downloadCsv(results)} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem' }}>
+                  <Download size={13} /> Download CSV
                 </button>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto max-h-[520px] overflow-y-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+              <div className="card" style={{ overflow: 'hidden' }}>
+                <div style={{ overflowX: 'auto', maxHeight: 500, overflowY: 'auto' }}>
+                  <table className="data-table">
+                    <thead>
                       <tr>
-                        {['UniProt', 'Res', 'Pos', 'Status', 'Tier', 'DAS', 'PDS'].map(h => (
-                          <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-gray-600">
-                            {h}
-                          </th>
-                        ))}
+                        {['UniProt', 'Res', 'Pos', 'Status', 'Tier', 'DAS', 'PDS'].map(h => <th key={h}>{h}</th>)}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody>
                       {results.map((r, i) => (
-                        <tr key={i} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 font-mono text-xs">{r.uniprot_id}</td>
-                          <td className="px-4 py-2">{r.residue ?? '—'}</td>
-                          <td className="px-4 py-2">{r.position}</td>
-                          <td className="px-4 py-2"><StatusBadge status={r.status} /></td>
-                          <td className="px-4 py-2">
-                            {r.evidence_tier ? <TierBadge tier={r.evidence_tier} /> : '—'}
-                          </td>
-                          <td className="px-4 py-2">
-                            {r.das_score != null ? <DASBadge das={r.das_score} /> : '—'}
-                          </td>
-                          <td className="px-4 py-2 text-gray-600">
-                            {r.pds_score ?? '—'}
-                          </td>
+                        <tr key={i}>
+                          <td style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.78rem' }}>{r.uniprot_id}</td>
+                          <td>{r.residue ?? '—'}</td>
+                          <td>{r.position}</td>
+                          <td><StatusBadge status={r.status} /></td>
+                          <td>{r.evidence_tier ? <TierBadge tier={r.evidence_tier} /> : '—'}</td>
+                          <td>{r.das_score != null ? <DASBadge das={r.das_score} /> : '—'}</td>
+                          <td>{r.pds_score ?? '—'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -213,9 +193,9 @@ export const BatchAnnotator = () => {
           )}
 
           {!loading && results.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-48 text-gray-400 text-sm">
-              <Upload className="h-10 w-10 mb-3 text-gray-200" />
-              <p>Paste sites or upload a file, then click Annotate.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 200, color: '#94a3b8' }}>
+              <Upload size={40} style={{ color: '#BFDBFE', marginBottom: 12 }} />
+              <p style={{ fontSize: '0.875rem' }}>Paste sites or upload a file, then click Annotate.</p>
             </div>
           )}
         </div>

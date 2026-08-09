@@ -1,23 +1,48 @@
-import { Dna } from 'lucide-react'
-
 export const Footer = () => (
-  <footer className="border-t border-gray-200/80 bg-gray-50/50">
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
-        <div className="flex items-center gap-2">
-          <Dna className="h-3.5 w-3.5 text-brand-400" />
-          <span className="font-semibold text-gray-500">DeepPhos</span>
-          <span className="text-gray-300">|</span>
-          <span>300,038 sites across 44,112 proteins</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <a href="/about" className="hover:text-brand-600 transition-colors">About</a>
-          <a href="/about#citation" className="hover:text-brand-600 transition-colors">Cite</a>
-          <a href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/docs`}
-             target="_blank" rel="noreferrer" className="hover:text-brand-600 transition-colors">API</a>
-        </div>
-        <p className="text-gray-300">&copy; 2026 DeepPhos. CC BY 4.0.</p>
+  <footer style={{
+    borderTop: '1px solid var(--color-border-light)',
+    background: '#ffffff',
+    padding: '14px 24px',
+  }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      gap: '8px',
+      fontSize: '11px',
+      color: 'var(--color-muted)',
+    }}>
+      <span>
+        <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>PhosNet</span>
+        {' '}— 300,038 phosphorylation sites · 44,112 proteins · ≥13 species
+      </span>
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <a href="/about" style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
+           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
+           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
+          About
+        </a>
+        <a href="/about#citation" style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
+           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
+           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
+          Cite
+        </a>
+        <a href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/docs`}
+           target="_blank" rel="noreferrer"
+           style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
+           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
+           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
+          API
+        </a>
+        <a href="https://habdsk.org/" target="_blank" rel="noreferrer"
+           style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
+           onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
+           onMouseOut={e => (e.currentTarget.style.color = 'var(--color-muted)')}>
+          S-Khan Lab
+        </a>
       </div>
+      <span style={{ color: '#94a3b8' }}>&copy; 2026 PhosNet · CC BY 4.0</span>
     </div>
   </footer>
 )

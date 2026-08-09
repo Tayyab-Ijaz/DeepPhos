@@ -5,7 +5,7 @@ import {
   flexRender,
   type ColumnDef, type SortingState,
 } from '@tanstack/react-table'
-import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { getTopSites } from '../api/client'
 import { LoadingSpinner, ErrorBox } from '../components/ui/LoadingSpinner'
 import { TierBadge, ResidueBadge, DASBadge } from '../components/ui/Badge'
@@ -13,24 +13,23 @@ import { EvidenceBar } from '../components/ui/EvidenceBar'
 import type { PhosphoSite } from '../types'
 
 const PAGE_SIZES = [25, 50, 100]
-const TIERS = ['ALL', 'GOLD', 'SILVER', 'BRONZE']
+const TIERS    = ['ALL', 'GOLD', 'SILVER', 'BRONZE']
 const RESIDUES = ['ALL', 'S', 'T', 'Y']
 
 export const Browse = () => {
-  const [sites,   setSites]   = useState<PhosphoSite[]>([])
-  const [total,   setTotal]   = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState('')
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'das_score', desc: true }])
+  const [sites,      setSites]      = useState<PhosphoSite[]>([])
+  const [total,      setTotal]      = useState(0)
+  const [loading,    setLoading]    = useState(true)
+  const [error,      setError]      = useState('')
+  const [sorting,    setSorting]    = useState<SortingState>([{ id: 'das_score', desc: true }])
   const [tierFilter, setTierFilter] = useState('ALL')
   const [resFilter,  setResFilter]  = useState('ALL')
-  const [search, setSearch] = useState('')
-  const [pageSize,  setPageSize]  = useState(50)
-  const [pageIndex, setPageIndex] = useState(0)
+  const [search,     setSearch]     = useState('')
+  const [pageSize,   setPageSize]   = useState(50)
+  const [pageIndex,  setPageIndex]  = useState(0)
 
   const fetchPage = useCallback(() => {
-    setLoading(true)
-    setError('')
+    setLoading(true); setError('')
     getTopSites({
       limit: pageSize,
       offset: pageIndex * pageSize,
@@ -42,15 +41,12 @@ export const Browse = () => {
   }, [pageSize, pageIndex, tierFilter])
 
   useEffect(() => { fetchPage() }, [fetchPage])
-
-  // Reset to page 0 when filters change
   useEffect(() => { setPageIndex(0) }, [tierFilter, pageSize])
 
   const pageCount = Math.max(1, Math.ceil(total / pageSize))
 
-  // Client-side filtering for residue type and search (lightweight on the page)
   const filtered = useMemo(() => sites.filter(s => {
-    if (resFilter  !== 'ALL' && s.residue_type  !== resFilter)  return false
+    if (resFilter !== 'ALL' && s.residue_type !== resFilter) return false
     if (search && !s.uniprot_id.toLowerCase().includes(search.toLowerCase())
                && !(s.gene_name ?? '').toLowerCase().includes(search.toLowerCase())) return false
     return true
@@ -62,57 +58,27 @@ export const Browse = () => {
       header: 'UniProt',
       cell: ({ getValue }) => (
         <Link to={`/protein/${getValue<string>()}`}
-          className="font-medium text-brand-600 hover:underline">
+          style={{ fontFamily: "'JetBrains Mono',monospace", fontWeight: 600,
+                   color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.8rem' }}>
           {getValue<string>()}
         </Link>
       ),
     },
+    { accessorKey: 'gene_name',      header: 'Gene',     cell: ({ getValue }) => getValue<string>() ?? '—' },
+    { accessorKey: 'residue_type',   header: 'Res',      cell: ({ getValue }) => <ResidueBadge type={getValue<string>()} /> },
+    { accessorKey: 'position',       header: 'Position' },
+    { accessorKey: 'evidence_tier',  header: 'Tier',     cell: ({ getValue }) => <TierBadge tier={getValue<string>()} /> },
+    { accessorKey: 'das_score',      header: 'DAS',      cell: ({ getValue }) => <DASBadge das={getValue<number>()} /> },
+    { accessorKey: 'pds_score',      header: 'PDS' },
     {
-      accessorKey: 'gene_name',
-      header: 'Gene',
-      cell: ({ getValue }) => getValue<string>() ?? '—',
+      id: 'evidence', header: 'Sources',
+      cell: ({ row }) => <EvidenceBar sources={row.original.sources ?? []} pds={row.original.pds_score} />,
     },
     {
-      accessorKey: 'residue_type',
-      header: 'Res',
-      cell: ({ getValue }) => <ResidueBadge type={getValue<string>()} />,
-    },
-    {
-      accessorKey: 'position',
-      header: 'Position',
-    },
-    {
-      accessorKey: 'evidence_tier',
-      header: 'Tier',
-      cell: ({ getValue }) => <TierBadge tier={getValue<string>()} />,
-    },
-    {
-      accessorKey: 'das_score',
-      header: 'DAS',
-      cell: ({ getValue }) => <DASBadge das={getValue<number>()} />,
-    },
-    {
-      accessorKey: 'pds_score',
-      header: 'PDS',
-    },
-    {
-      id: 'evidence',
-      header: 'Sources',
+      id: 'detail', header: '',
       cell: ({ row }) => (
-        <EvidenceBar
-          sources={row.original.sources ?? []}
-          pds={row.original.pds_score}
-        />
-      ),
-    },
-    {
-      id: 'detail',
-      header: '',
-      cell: ({ row }) => (
-        <Link
-          to={`/site/${row.original.uniprot_id}/${row.original.residue_type}/${row.original.position}`}
-          className="text-xs text-brand-600 hover:underline whitespace-nowrap"
-        >
+        <Link to={`/site/${row.original.uniprot_id}/${row.original.residue_type}/${row.original.position}`}
+          style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
           View →
         </Link>
       ),
@@ -120,8 +86,7 @@ export const Browse = () => {
   ], [])
 
   const table = useReactTable({
-    data: filtered,
-    columns,
+    data: filtered, columns,
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -129,93 +94,97 @@ export const Browse = () => {
   })
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Browse Phosphorylation Sites</h1>
-        <p className="text-sm text-gray-500 mt-1">
+    <div style={{ padding: '28px 32px', maxWidth: 1200 }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: 22 }}>
+        <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Browse Phosphorylation Sites</h1>
+        <p className="page-subtitle">
           Showing top sites by Database Agreement Score. Use filters to narrow results.
         </p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-5">
-        <input
-          placeholder="Search UniProt ID or gene…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm
-                     focus:outline-none focus:border-brand-400 bg-white w-56"
-        />
-        <div className="flex gap-1">
-          {TIERS.map(t => (
-            <button key={t} onClick={() => setTierFilter(t)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors
-                ${tierFilter === t
-                  ? 'bg-brand-600 text-white border-brand-600'
-                  : 'border-gray-200 text-gray-600 hover:border-brand-400'}`}>
-              {t}
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-1">
-          {RESIDUES.map(r => (
-            <button key={r} onClick={() => setResFilter(r)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors
-                ${resFilter === r
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-200 text-gray-600 hover:border-blue-400'}`}>
-              {r}
-            </button>
-          ))}
-        </div>
+      <div className="card" style={{ padding: '14px 18px', marginBottom: 16 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
 
-        <select
-          value={pageSize}
-          onChange={e => setPageSize(Number(e.target.value))}
-          className="ml-auto border border-gray-200 rounded-lg px-2 py-1.5 text-sm
-                     focus:outline-none focus:border-brand-400 bg-white"
-        >
-          {PAGE_SIZES.map(s => <option key={s} value={s}>{s} / page</option>)}
-        </select>
+          {/* Search */}
+          <div style={{ position: 'relative' }}>
+            <Search size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+            <input
+              placeholder="UniProt ID or gene…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="input-field"
+              style={{ paddingLeft: 28, width: 200 }}
+            />
+          </div>
+
+          {/* Tier pills */}
+          <div style={{ display: 'flex', gap: 4 }}>
+            {TIERS.map(t => (
+              <button key={t} onClick={() => setTierFilter(t)}
+                className={`pill ${tierFilter === t ? 'pill-active' : ''}`}>
+                {t}
+              </button>
+            ))}
+          </div>
+
+          {/* Residue pills */}
+          <div style={{ display: 'flex', gap: 4 }}>
+            {RESIDUES.map(r => (
+              <button key={r} onClick={() => setResFilter(r)}
+                className={`pill ${resFilter === r ? 'pill-active' : ''}`}>
+                {r}
+              </button>
+            ))}
+          </div>
+
+          {/* Page size */}
+          <select
+            value={pageSize}
+            onChange={e => setPageSize(Number(e.target.value))}
+            className="input-field"
+            style={{ marginLeft: 'auto', width: 'auto', paddingRight: 10 }}
+          >
+            {PAGE_SIZES.map(s => <option key={s} value={s}>{s} / page</option>)}
+          </select>
+        </div>
       </div>
 
       {loading ? <LoadingSpinner label="Loading sites…" /> : error ? (
         <ErrorBox message={error} />
       ) : (
         <>
-          <p className="text-xs text-gray-500 mb-2">
+          <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: 8 }}>
             {total.toLocaleString()} total sites · page {pageIndex + 1} of {pageCount}
-            {filtered.length < sites.length && ` · ${filtered.length} shown after local filters`}
+            {filtered.length < sites.length && ` · ${filtered.length} shown after filters`}
           </p>
 
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-4">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+          {/* Table */}
+          <div className="card" style={{ overflow: 'hidden', marginBottom: 14 }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
                   {table.getHeaderGroups().map(hg => (
                     <tr key={hg.id}>
                       {hg.headers.map(h => (
-                        <th key={h.id}
-                          className="px-4 py-3 text-left text-xs font-semibold text-gray-600 whitespace-nowrap"
-                          onClick={h.column.getToggleSortingHandler()}
-                        >
-                          <span className="flex items-center gap-1 cursor-pointer select-none">
+                        <th key={h.id} onClick={h.column.getToggleSortingHandler()}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', userSelect: 'none' }}>
                             {flexRender(h.column.columnDef.header, h.getContext())}
-                            {h.column.getIsSorted() === 'asc'  && <ChevronUp className="h-3 w-3" />}
-                            {h.column.getIsSorted() === 'desc' && <ChevronDown className="h-3 w-3" />}
+                            {h.column.getIsSorted() === 'asc'  && <ChevronUp size={12} />}
+                            {h.column.getIsSorted() === 'desc' && <ChevronDown size={12} />}
                           </span>
                         </th>
                       ))}
                     </tr>
                   ))}
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                   {table.getRowModel().rows.map(row => (
-                    <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={row.id}>
                       {row.getVisibleCells().map(cell => (
-                        <td key={cell.id} className="px-4 py-2.5">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
+                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                       ))}
                     </tr>
                   ))}
@@ -225,25 +194,19 @@ export const Browse = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <button
-              onClick={() => setPageIndex(i => Math.max(0, i - 1))}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <button onClick={() => setPageIndex(i => Math.max(0, i - 1))}
               disabled={pageIndex === 0}
-              className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg
-                         disabled:opacity-40 hover:border-brand-400 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft className="h-4 w-4" /> Prev
+              className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <ChevronLeft size={15} /> Prev
             </button>
-            <span className="text-xs">
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-muted)' }}>
               Page {pageIndex + 1} / {pageCount}
             </span>
-            <button
-              onClick={() => setPageIndex(i => Math.min(pageCount - 1, i + 1))}
+            <button onClick={() => setPageIndex(i => Math.min(pageCount - 1, i + 1))}
               disabled={pageIndex >= pageCount - 1}
-              className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg
-                         disabled:opacity-40 hover:border-brand-400 disabled:cursor-not-allowed"
-            >
-              Next <ChevronRight className="h-4 w-4" />
+              className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              Next <ChevronRight size={15} />
             </button>
           </div>
         </>

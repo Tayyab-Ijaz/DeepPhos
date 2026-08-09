@@ -17,6 +17,7 @@ export default {
           900: '#1e3a8a',
           950: '#172554',
         },
+        pink:   { DEFAULT: '#DB2777', light: '#fce7f3', dark: '#be185d' },
         gold:   { DEFAULT: '#d97706', light: '#fef3c7', text: '#92400e' },
         silver: { DEFAULT: '#6b7280', light: '#f3f4f6', text: '#374151' },
         bronze: { DEFAULT: '#b45309', light: '#fef9c3', text: '#78350f' },
@@ -26,9 +27,10 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
-        'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04)',
-        'glow': '0 0 20px rgb(37 99 235 / 0.15)',
+        'card':      '0 2px 12px rgba(79,70,229,0.06)',
+        'card-hover':'0 4px 20px rgba(79,70,229,0.12)',
+        'glow':      '0 0 20px rgb(37 99 235 / 0.15)',
+        'sidebar':   '2px 0 8px rgba(79,70,229,0.06)',
       },
       borderRadius: {
         '2xl': '1rem',

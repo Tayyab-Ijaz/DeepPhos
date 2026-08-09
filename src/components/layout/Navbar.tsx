@@ -27,7 +27,7 @@ export const Navbar = () => {
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-base font-bold text-gray-900 group-hover:text-brand-700 transition-colors">
-                DeepPhos
+                PhosNet
               </span>
               <span className="hidden sm:block text-[10px] text-gray-400 font-medium tracking-wide">
                 Phosphorylation Meta-Database

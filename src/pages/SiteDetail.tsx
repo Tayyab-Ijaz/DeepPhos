@@ -8,23 +8,31 @@ import { EvidenceBar } from '../components/ui/EvidenceBar'
 import { uniprotUrl, pubmedUrl } from '../utils/format'
 import type { SiteDetail as SiteDetailType, SiteConflict } from '../types'
 
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <div className="bg-white rounded-xl border border-gray-200 p-6">
-    <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">{title}</h2>
-    {children}
+const InfoSection = ({ title, accentColor = '#2563EB', children }: {
+  title: string; accentColor?: string; children: React.ReactNode
+}) => (
+  <div className="card" style={{ borderTop: `3px solid ${accentColor}`, marginBottom: 16 }}>
+    <div style={{ padding: '18px 22px' }}>
+      <p style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase',
+                  letterSpacing: '0.1em', color: accentColor, marginBottom: 14 }}>
+        {title}
+      </p>
+      {children}
+    </div>
   </div>
 )
 
 const KV = ({ label, value }: { label: string; value: React.ReactNode }) => (
-  <div className="flex items-start gap-2 py-2 border-b border-gray-100 last:border-0">
-    <span className="w-40 shrink-0 text-xs text-gray-500">{label}</span>
-    <span className="text-sm text-gray-800">{value}</span>
+  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 0',
+                borderBottom: '1px solid var(--color-bg)', fontSize: '0.8125rem' }}>
+    <span style={{ width: 160, flexShrink: 0, color: 'var(--color-muted)', fontSize: '0.78rem' }}>{label}</span>
+    <span style={{ color: 'var(--color-text)' }}>{value}</span>
   </div>
 )
 
 export const SiteDetail = () => {
   const { uniprotId, res, pos } = useParams<{ uniprotId: string; res: string; pos: string }>()
-  const [detail, setDetail] = useState<SiteDetailType | null>(null)
+  const [detail,  setDetail]  = useState<SiteDetailType | null>(null)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState('')
 
@@ -38,37 +46,40 @@ export const SiteDetail = () => {
   }, [uniprotId, res, pos])
 
   if (loading) return <LoadingSpinner label="Loading site details…" />
-  if (error)   return <div className="mx-auto max-w-3xl p-8"><ErrorBox message={error} /></div>
+  if (error)   return <div style={{ maxWidth: 600, padding: 32 }}><ErrorBox message={error} /></div>
   if (!detail) return null
 
-  const site = detail.site
+  const site      = detail.site
   const pmids: number[] = detail.site.pmids ?? []
-  const conflicts = detail.conflicts ?? []
+  const conflicts       = detail.conflicts ?? []
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 space-y-5">
+    <div style={{ maxWidth: 820, padding: '28px 32px' }}>
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500">
-        <Link to="/" className="hover:text-brand-600">Home</Link>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem',
+                    color: 'var(--color-muted)', marginBottom: 20 }}>
+        <Link to="/" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>Home</Link>
         <span>/</span>
-        <Link to={`/protein/${uniprotId}`} className="hover:text-brand-600">{uniprotId}</Link>
+        <Link to={`/protein/${uniprotId}`} style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{uniprotId}</Link>
         <span>/</span>
-        <span className="text-gray-800 font-medium">{res}{pos}</span>
+        <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{res}{pos}</span>
       </nav>
 
       {/* Title card */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="card card-accent-blue" style={{ padding: '20px 24px', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            <h1 className="page-title" style={{ fontSize: '1.4rem' }}>
               {res}{pos} · {uniprotId}
             </h1>
             {detail.protein?.protein_name && (
-              <p className="text-sm text-gray-500">{detail.protein.protein_name}</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginTop: 4 }}>
+                {detail.protein.protein_name}
+              </p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <ResidueBadge type={site.residue_type} />
             <TierBadge tier={site.evidence_tier} />
             <DASBadge das={site.das_score} />
@@ -76,93 +87,78 @@ export const SiteDetail = () => {
         </div>
       </div>
 
-      {/* Evidence */}
-      <Section title="Evidence Summary">
-        <KV label="Database Agreement" value={
-          <span className="font-semibold">{site.das_score} / 3 databases</span>
-        } />
-        <KV label="Publication Depth" value={
-          <span>{site.pds_score} unique publication{site.pds_score !== 1 ? 's' : ''}</span>
-        } />
-        <KV label="Confidence Score" value={
-          typeof site.confidence === 'number'
-            ? site.confidence.toFixed(3)
-            : '—'
-        } />
-        <KV label="Source Databases" value={
-          <EvidenceBar sources={site.sources ?? []} pds={site.pds_score} />
-        } />
-        <KV label="UniProt" value={
+      {/* Evidence summary */}
+      <InfoSection title="Evidence Summary" accentColor="#2563EB">
+        <KV label="Database Agreement" value={<span style={{ fontWeight: 600 }}>{site.das_score} / 3 databases</span>} />
+        <KV label="Publication Depth"  value={<span>{site.pds_score} unique publication{site.pds_score !== 1 ? 's' : ''}</span>} />
+        <KV label="Confidence Score"   value={typeof site.confidence === 'number' ? site.confidence.toFixed(3) : '—'} />
+        <KV label="Source Databases"   value={<EvidenceBar sources={site.sources ?? []} pds={site.pds_score} />} />
+        <KV label="UniProt"            value={
           <a href={uniprotUrl(uniprotId!)} target="_blank" rel="noreferrer"
-            className="flex items-center gap-1 text-brand-600 hover:underline">
-            {uniprotId} <ExternalLink className="h-3 w-3" />
+             style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--color-primary)', textDecoration: 'none' }}>
+            {uniprotId} <ExternalLink size={12} />
           </a>
         } />
-      </Section>
+      </InfoSection>
 
       {/* PMIDs */}
       {pmids.length > 0 && (
-        <Section title={`Supporting Publications (${pmids.length})`}>
-          <div className="flex flex-wrap gap-2">
+        <InfoSection title={`Supporting Publications (${pmids.length})`} accentColor="#059669">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {pmids.map(pmid => (
-              <a key={pmid}
-                href={pubmedUrl(pmid)}
-                target="_blank" rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700
-                           border border-blue-200 rounded px-2 py-1 hover:bg-blue-100">
-                PMID: {pmid} <ExternalLink className="h-3 w-3" />
+              <a key={pmid} href={pubmedUrl(pmid)} target="_blank" rel="noreferrer"
+                 className="source-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: 4,
+                                                padding: '4px 10px', fontSize: '0.75rem', borderRadius: 6 }}>
+                PMID: {pmid} <ExternalLink size={10} />
               </a>
             ))}
           </div>
-        </Section>
+        </InfoSection>
       )}
 
       {/* Conflicts */}
       {conflicts.length > 0 && (
-        <Section title={`Nearby Position Conflicts (${conflicts.length})`}>
-          <div className="mb-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50
-                          border border-amber-200 rounded-lg px-3 py-2">
-            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-            <span>
-              These sites are within ±5 residues and may represent the same phosphorylation
-              event reported at slightly different positions.
-            </span>
+        <InfoSection title={`Nearby Position Conflicts (${conflicts.length})`} accentColor="#d97706">
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: '0.78rem',
+                        background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8,
+                        padding: '10px 14px', marginBottom: 12, color: '#92400e' }}>
+            <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span>Sites within ±5 residues may represent the same phosphorylation event at slightly different positions.</span>
           </div>
-          <table className="w-full text-sm">
+          <table className="data-table">
             <thead>
-              <tr className="border-b border-gray-100 text-xs text-gray-500">
-                <th className="text-left py-1 pr-4">Site</th>
-                <th className="text-left py-1 pr-4">DAS</th>
-                <th className="text-left py-1">Distance</th>
+              <tr>
+                <th>Site</th>
+                <th>DAS</th>
+                <th>Distance</th>
               </tr>
             </thead>
             <tbody>
               {conflicts.map((c: SiteConflict) => {
                 const otherPos = c.pos_a === Number(pos) ? c.pos_b : c.pos_a
                 return (
-                <tr key={c.conflict_id} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="py-2 pr-4">
-                    <Link
-                      to={`/site/${uniprotId}/${c.residue_type}/${otherPos}`}
-                      className="text-brand-600 hover:underline"
-                    >
-                      {c.residue_type}{otherPos}
-                    </Link>
-                  </td>
-                  <td className="py-2 pr-4"><DASBadge das={c.das_a} /></td>
-                  <td className="py-2 text-xs text-gray-500">±{c.distance}</td>
-                </tr>
+                  <tr key={c.conflict_id}>
+                    <td>
+                      <Link to={`/site/${uniprotId}/${c.residue_type}/${otherPos}`}
+                        style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
+                        {c.residue_type}{otherPos}
+                      </Link>
+                    </td>
+                    <td><DASBadge das={c.das_a} /></td>
+                    <td style={{ color: 'var(--color-muted)', fontSize: '0.78rem' }}>±{c.distance}</td>
+                  </tr>
                 )
               })}
             </tbody>
           </table>
-        </Section>
+        </InfoSection>
       )}
 
       {/* Back link */}
       <Link to={`/protein/${uniprotId}`}
-        className="inline-flex items-center gap-1 text-sm text-brand-600 hover:underline">
-        <ChevronLeft className="h-4 w-4" /> Back to {uniprotId}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.8125rem',
+                 color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
+        <ChevronLeft size={15} /> Back to {uniprotId}
       </Link>
     </div>
   )
