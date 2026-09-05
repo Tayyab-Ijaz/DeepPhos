@@ -66,11 +66,22 @@ export const Home = () => {
     <div>
 
       {/* ── Banner ────────────────────────────────────────────────────── */}
-      <img
-        src="/banner.png"
-        alt="PhosNet — Phosphorylation Meta-Database"
-        style={{ width: '100%', maxHeight: 168, objectFit: 'cover', display: 'block' }}
-      />
+      <div style={{
+        width: '100%',
+        aspectRatio: '2172 / 526',
+        maxHeight: 210,
+        background: 'linear-gradient(90deg, #E3EEFC 0%, #F7FAFF 50%, #FCE9F4 100%)',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <img
+          src="/banner.png"
+          alt="PhosNet — Phosphorylation Meta-Database"
+          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+        />
+      </div>
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <div style={{ background: '#ffffff', borderBottom: '1.5px solid var(--color-border-light)', padding: '32px 30px 28px', textAlign: 'center' }}>
@@ -133,7 +144,7 @@ export const Home = () => {
         {!loading && stats && !apiDown && (
           <div style={{ marginBottom: 28 }}>
             <p className="section-label">Database Overview</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
+            <div className="grid-3" style={{ gap: 14 }}>
               {[
                 { title: 'Evidence Tier Distribution', el: <TierPieChart stats={stats} />   },
                 { title: 'DAS Score Distribution',     el: <DASBarChart  data={dasData} /> },
@@ -151,7 +162,7 @@ export const Home = () => {
         {/* Feature cards */}
         <div style={{ marginBottom: 28 }}>
           <p className="section-label">Core Features</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 14 }}>
+          <div className="grid-2" style={{ gap: 14 }}>
             {FEATURES.map(f => (
               <div key={f.title} className="card-hover" style={{ padding: '18px 20px', display: 'flex', gap: 14 }}>
                 <div style={{
@@ -177,7 +188,7 @@ export const Home = () => {
         {/* Quick nav */}
         <div style={{ marginBottom: 28 }}>
           <p className="section-label">Get Started</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
+          <div className="grid-3" style={{ gap: 14 }}>
             {QUICKLINKS.map(q => (
               <Link key={q.to} to={q.to} style={{ textDecoration: 'none' }}>
                 <div className="card-hover" style={{ padding: '16px 18px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>

@@ -360,4 +360,15 @@
     padding:        10px 10px 3px;
     display:        block;
   }
+
+  /* ── Responsive grids ──────────────────────────────────────────────── */
+  .grid-2     { display: grid; grid-template-columns: repeat(2, 1fr); }
+  .grid-3     { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .grid-batch { display: grid; grid-template-columns: 300px 1fr; }
+
+  @media (max-width: 640px) {
+    .grid-2, .grid-3, .grid-batch {
+      grid-template-columns: 1fr;
+    }
+  }
 }

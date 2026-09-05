@@ -75,7 +75,7 @@ export const BatchAnnotator = () => {
         </span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 20, alignItems: 'start' }}>
+      <div className="grid-batch" style={{ gap: 20, alignItems: 'start' }}>
 
         {/* Input panel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -146,7 +146,7 @@ export const BatchAnnotator = () => {
           {!loading && results.length > 0 && (
             <>
               {/* Summary stats */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 16 }}>
+              <div className="grid-3" style={{ gap: 12, marginBottom: 16 }}>
                 {[
                   { label:'KNOWN',     count: known,    icon: <CheckCircle size={18} />, color: '#059669', bg: '#ECFDF5' },
                   { label:'NOVEL',     count: novel,    icon: <AlertCircle size={18} />, color: '#2563EB', bg: '#EFF6FF' },

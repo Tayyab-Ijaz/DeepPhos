@@ -34,25 +34,6 @@ const SidebarContent = ({ onNav }: { onNav?: () => void }) => {
 
   return (
     <>
-      {/* Lab logo */}
-      <div style={{ padding: '16px 14px 12px', borderBottom: '1px solid var(--color-border-light)' }}>
-        <a href="https://habdsk.org/" target="_blank" rel="noopener noreferrer"
-           style={{ display: 'block', borderRadius: 10, overflow: 'hidden',
-                    border: '1px solid var(--color-border-blue)', textDecoration: 'none' }}>
-          <img src="/lablogo.png" alt="S-Khan Lab"
-               style={{ width: '100%', objectFit: 'contain', display: 'block', maxHeight: 72 }} />
-        </a>
-        <a href="https://habdsk.org/" target="_blank" rel="noopener noreferrer"
-           style={{ display: 'block', textAlign: 'center', marginTop: 7, textDecoration: 'none' }}>
-          <span style={{ fontSize: '9.5px', fontWeight: 700, letterSpacing: '0.04em', lineHeight: 1.4 }}>
-            <span style={{ color: '#2563eb' }}>Home </span>
-            <span style={{ color: '#16a34a' }}>of </span>
-            <span style={{ color: '#9333ea' }}>All </span>
-            <span style={{ color: '#dc2626' }}>DataBases</span>
-          </span>
-        </a>
-      </div>
-
       {/* Quick search */}
       <div style={{ padding: '10px 12px 6px' }}>
         <form onSubmit={handleSearch}>
@@ -88,6 +69,28 @@ const SidebarContent = ({ onNav }: { onNav?: () => void }) => {
             {label}
           </NavLink>
         ))}
+
+        {/* Lab logo — between nav and external links, no box, larger */}
+        <div style={{
+          padding: '16px 6px', margin: '6px 0', textAlign: 'center',
+          borderTop: '1px solid var(--color-border-light)',
+          borderBottom: '1px solid var(--color-border-light)',
+        }}>
+          <a href="https://habdsk.org/" target="_blank" rel="noopener noreferrer"
+             style={{ display: 'block', textDecoration: 'none' }}>
+            <img src="/lablogo.png" alt="S-Khan Lab"
+                 style={{ width: '72%', maxWidth: 140, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
+          </a>
+          <a href="https://habdsk.org/" target="_blank" rel="noopener noreferrer"
+             style={{ display: 'block', marginTop: 8, textDecoration: 'none' }}>
+            <span style={{ fontSize: '9.5px', fontWeight: 700, letterSpacing: '0.04em', lineHeight: 1.4 }}>
+              <span style={{ color: '#2563eb' }}>Home </span>
+              <span style={{ color: '#16a34a' }}>of </span>
+              <span style={{ color: '#9333ea' }}>All </span>
+              <span style={{ color: '#dc2626' }}>DataBases</span>
+            </span>
+          </a>
+        </div>
 
         <span className="sidebar-section-label" style={{ marginTop: 6 }}>External</span>
         {EXTERNAL.map(({ href, label, icon: Icon }) => (

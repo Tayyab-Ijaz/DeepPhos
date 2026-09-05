@@ -78,7 +78,7 @@ export const About = () => (
 
     <InfoCard color="#d97706">
       <CardLabel color="#d97706">Scoring System</CardLabel>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+      <div className="grid-2" style={{ gap: 12, marginBottom: 16 }}>
         {[
           { title: 'Database Agreement Score (DAS)', desc: 'Counts distinct source databases reporting a given (UniProt ID, residue, position) triplet. Range 0–3.', badge: 'Range: 0 – 3', badgeColor: '#2563EB' },
           { title: 'Publication Depth Score (PDS)',  desc: 'Number of unique PubMed IDs reporting a site — reflects independent experimental detection within 47 curated studies.', badge: 'Range: 0 – n', badgeColor: '#059669' },
