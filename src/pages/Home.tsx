@@ -65,17 +65,9 @@ export const Home = () => {
   return (
     <div>
 
-      {/* ── Banner ────────────────────────────────────────────────────── */}
-      <div style={{
-        width: '100%',
-        aspectRatio: '2172 / 526',
-        maxHeight: 210,
-        background: 'linear-gradient(90deg, #E3EEFC 0%, #F7FAFF 50%, #FCE9F4 100%)',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      {/* ── Banner ── container's aspect-ratio matches banner.png's real 2172×526 pixel size exactly,
+             so contain always fills it with zero leftover space (no gap for any background to show) ── */}
+      <div style={{ width: '100%', aspectRatio: '2172 / 526' }}>
         <img
           src="/banner.png"
           alt="PhosNet — Phosphorylation Meta-Database"
