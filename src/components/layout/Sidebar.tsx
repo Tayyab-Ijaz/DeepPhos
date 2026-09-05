@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { Home, Layers, FileText, Info, ExternalLink, FlaskConical, Dna, Search, Menu, X } from 'lucide-react'
+import { API_BASE_URL } from '../../api/client'
 
 const NAV = [
   { to: '/',       label: 'Home',            icon: Home,          end: true  },
@@ -10,7 +11,7 @@ const NAV = [
 ]
 
 const EXTERNAL = [
-  { href: `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/docs`, label: 'API Docs', icon: FlaskConical },
+  { href: `${API_BASE_URL}/docs`, label: 'API Docs', icon: FlaskConical },
   { href: 'https://habdsk.org/', label: 'S-Khan Lab', icon: Home },
 ]
 

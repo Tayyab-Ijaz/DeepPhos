@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { Search, Dna, Menu, X, ExternalLink } from 'lucide-react'
+import { API_BASE_URL } from '../../api/client'
 
 export const Navbar = () => {
   const [query, setQuery] = useState('')
@@ -51,7 +52,7 @@ export const Navbar = () => {
 
           {/* Right actions */}
           <div className="hidden md:flex items-center gap-1">
-            <a href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/docs`}
+            <a href={`${API_BASE_URL}/docs`}
                target="_blank" rel="noreferrer"
                className="flex items-center gap-1.5 btn-ghost text-xs">
               API Docs <ExternalLink className="h-3 w-3 opacity-50" />

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../api/client'
+
 export const Footer = () => (
   <footer style={{ borderTop: '1.5px solid var(--color-border-light)', background: '#ffffff', padding: '12px 30px' }}>
     <style>{`
@@ -12,7 +14,7 @@ export const Footer = () => (
       <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
         <a href="/about"          className="footer-link">About</a>
         <a href="/about#citation" className="footer-link">Cite</a>
-        <a href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/docs`} target="_blank" rel="noreferrer" className="footer-link">API Docs</a>
+        <a href={`${API_BASE_URL}/docs`} target="_blank" rel="noreferrer" className="footer-link">API Docs</a>
         <a href="https://habdsk.org/" target="_blank" rel="noreferrer" className="footer-link">S-Khan Lab</a>
       </div>
       <span style={{ fontSize: '11px', color: 'var(--color-faint)' }}>&copy; 2026 PhosNet · CC BY 4.0</span>
